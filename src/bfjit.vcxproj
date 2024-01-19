@@ -129,7 +129,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="bfjit.cpp" />
+    <ClCompile Include="bf-Lexer.cpp" />
+    <ClCompile Include="bf-Lexer.ixx" />
+    <ClCompile Include="bf-Token.cpp" />
+    <ClCompile Include="bf-Token.ixx" />
+    <ClCompile Include="bf.ixx" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

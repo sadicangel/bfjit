@@ -15,8 +15,23 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="bfjit.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bf.ixx">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bf-Token.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bf-Lexer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bf-Token.ixx">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bf-Lexer.ixx">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
