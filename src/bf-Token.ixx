@@ -11,8 +11,8 @@ namespace bf
             DEC = '-',
             LEFT = '<',
             RIGHT = '>',
-            IN = '.',
-            OUT = ',',
+            IN = ',',
+            OUT = '.',
             JZ = '[',
             JNZ = ']'
         };

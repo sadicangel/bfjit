@@ -33,5 +33,11 @@
     <ClCompile Include="bf-Lexer.ixx">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="bf-Interpreter.ixx">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bf-Interpreter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

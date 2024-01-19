@@ -17,6 +17,6 @@ namespace bf
         }
 
         Token::Kind next();
-        std::vector<Token> lex();
+        std::vector<Token> lex(bool log = false);
     };
 }

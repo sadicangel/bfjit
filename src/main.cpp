@@ -6,9 +6,8 @@ static constexpr std::string_view content = "++++++++[>++++[>++>+++>+++>+<<<<-]>
 int main()
 {
     auto lexer = bf::Lexer(content);
-    const auto tokens = lexer.lex();
+    const auto tokens = lexer.lex(false);
 
-    for(size_t i = 0; i < tokens.size(); ++i) {
-        std::cout << i << ": " << tokens[i].to_string() << std::endl;
-    }
+    auto interpreter = bf::Interpreter();
+    interpreter.interpret(tokens);
 }

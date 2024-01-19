@@ -16,7 +16,7 @@ Token::Kind Lexer::next() {
     return static_cast<Token::Kind>(_content[_position++]);
 }
 
-std::vector<Token> Lexer::lex() {
+std::vector<Token> Lexer::lex(bool log) {
     std::stack<size_t> addresses{};
     std::vector<Token> tokens{};
     auto k = next();
@@ -54,10 +54,7 @@ std::vector<Token> Lexer::lex() {
         } break;
         case Token::Kind::JNZ: {
             if (addresses.size() == 0) {
-                // TODO: Make this pretty.
-                std::string msg = "[" + _position;
-                msg += "] unbalanced loop\n";
-                throw std::domain_error(msg);
+                throw std::domain_error("[" + std::to_string(_position) + "] unbalanced loop\n");
             }
 
             auto addr = addresses.top();
@@ -71,6 +68,11 @@ std::vector<Token> Lexer::lex() {
 
             k = next();
         } break;
+        }
+    }
+    if (log) {
+        for (size_t i = 0; i < tokens.size(); ++i) {
+            std::cout << i << ": " << tokens[i].to_string() << '\n';
         }
     }
     return tokens;
