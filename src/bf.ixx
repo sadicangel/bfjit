@@ -1,5 +1,6 @@
 export module bf;
 
-export import :Token;
-export import :Lexer;
+export import :Examples;
 export import :Interpreter;
+export import :Lexer;
+export import :Token;
