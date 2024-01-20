@@ -6,12 +6,13 @@ import std;
 
 namespace bf
 {
+    /// <summary>
+    /// Brainfuck interpreter.
+    /// </summary>
     export class Interpreter {
         std::vector<size_t> _memory;
         size_t _mp;
         size_t _ip;
-
-
     
     public:
 
@@ -20,6 +21,10 @@ namespace bf
         {
         }
 
+        /// <summary>
+        /// Interpret a collection of tokens.
+        /// </summary>
+        /// <param name="tokens">A collection of parsed tokens to interpret.</param>
         void interpret(const std::vector<Token>& tokens);
     };
 }

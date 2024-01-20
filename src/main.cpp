@@ -1,10 +1,15 @@
 import std;
 import bf;
 
-static constexpr std::string_view content = "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.";
-
-int main()
+int main(int argc, char* argv[])
 {
+    std::string_view content = bf::Examples::hello_world;
+    if (argc > 1) {
+        std::ifstream in(argv[1]);
+        content = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+    }
+    // std::cout << "bf:\n" << content << "\n" << std::endl;
+
     auto lexer = bf::Lexer(content);
     const auto tokens = lexer.lex(false);
 

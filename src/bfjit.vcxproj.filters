@@ -39,5 +39,8 @@
     <ClCompile Include="bf-Interpreter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="bf-Examples.ixx">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

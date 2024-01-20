@@ -4,6 +4,8 @@ import std;
 
 using namespace bf;
 
+static constexpr std::string_view tokens = "+-<>.,[]";
+
 Token::Kind Lexer::next() {
     // Skip non valid tokens.
     while (_position < _content.length() && tokens.find(_content[_position]) == std::string_view::npos) {
@@ -19,6 +21,7 @@ Token::Kind Lexer::next() {
 std::vector<Token> Lexer::lex(bool log) {
     std::stack<size_t> addresses{};
     std::vector<Token> tokens{};
+    _position = 0;
     auto k = next();
     while (k != Token::Kind::EOF) {
         switch (k)

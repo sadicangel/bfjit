@@ -39,7 +39,10 @@ void Interpreter::interpret(const std::vector<Token>& tokens) {
         } break;
 
         case Token::Kind::IN: {
-            throw std::invalid_argument("not implemented");
+            for (size_t i = 0; i < token.operand; ++i) {
+                std::copy_n(std::istream_iterator<char>(std::cin), token.operand, _memory.begin());
+            }
+            ++_ip;
         } break;
 
         case Token::Kind::OUT: {
