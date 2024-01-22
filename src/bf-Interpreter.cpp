@@ -2,7 +2,8 @@ module bf;
 
 using namespace bf;
 
-void Interpreter::interpret(const std::vector<Token>& tokens) {
+void Interpreter::interpret(const std::vector<Token>& tokens)
+{
     _memory.clear();
     _memory.push_back(0);
     _mp = 0;

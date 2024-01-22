@@ -3,7 +3,8 @@ export module bf:Examples;
 import std;
 
 namespace bf {
-    export class Examples {
+    export class Examples
+    {
     public:
         static constexpr std::string_view hello_world =
             " 1 +++++ +++               Set Cell #0 to 8\n"

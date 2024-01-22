@@ -9,7 +9,8 @@ namespace bf
     /// <summary>
     /// Brainfuck interpreter.
     /// </summary>
-    export class Interpreter {
+    export class Interpreter
+    {
         std::vector<size_t> _memory;
         size_t _mp;
         size_t _ip;

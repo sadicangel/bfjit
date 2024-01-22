@@ -4,8 +4,10 @@ import std;
 
 namespace bf
 {
-    export struct Token {
-        enum class Kind {
+    export struct Token
+    {
+        enum class Kind
+        {
             EOF = 0,
             INC = '+',
             DEC = '-',

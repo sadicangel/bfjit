@@ -42,5 +42,17 @@
     <ClCompile Include="bf-Examples.ixx">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="bf-Jit.ixx">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bf-Jit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bf-Exec.ixx">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bf-Exec.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

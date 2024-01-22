@@ -6,7 +6,8 @@ using namespace bf;
 
 static constexpr std::string_view tokens = "+-<>.,[]";
 
-Token::Kind Lexer::next() {
+Token::Kind Lexer::next()
+{
     // Skip non valid tokens.
     while (_position < _content.length() && tokens.find(_content[_position]) == std::string_view::npos) {
         ++_position;
@@ -18,7 +19,8 @@ Token::Kind Lexer::next() {
     return static_cast<Token::Kind>(_content[_position++]);
 }
 
-std::vector<Token> Lexer::lex(bool log) {
+std::vector<Token> Lexer::lex(bool log)
+{
     std::stack<size_t> addresses{};
     std::vector<Token> tokens{};
     _position = 0;

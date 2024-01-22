@@ -77,8 +77,12 @@
     <ClCompile Include="bf-Examples.ixx" />
     <ClCompile Include="bf-Interpreter.cpp" />
     <ClCompile Include="bf-Interpreter.ixx" />
+    <ClCompile Include="bf-Jit.cpp" />
+    <ClCompile Include="bf-Jit.ixx" />
     <ClCompile Include="bf-Lexer.cpp" />
     <ClCompile Include="bf-Lexer.ixx" />
+    <ClCompile Include="bf-Exec.cpp" />
+    <ClCompile Include="bf-Exec.ixx" />
     <ClCompile Include="bf-Token.cpp" />
     <ClCompile Include="bf-Token.ixx" />
     <ClCompile Include="bf.ixx" />

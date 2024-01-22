@@ -5,7 +5,8 @@ import std;
 
 namespace bf
 {
-    export class Lexer {
+    export class Lexer
+    {
         std::string_view _content;
         size_t _position;
 

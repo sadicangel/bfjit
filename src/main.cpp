@@ -15,4 +15,10 @@ int main(int argc, char* argv[])
 
     auto interpreter = bf::Interpreter();
     interpreter.interpret(tokens);
+
+    auto jit = bf::Jit();
+    const auto code = jit.compile(tokens);
+
+    auto exec = bf::Exec(code);
+    exec.run();
 }

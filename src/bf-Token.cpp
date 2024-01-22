@@ -4,11 +4,13 @@ import std;
 
 using namespace bf;
 
-std::string Token::to_string() const {
+std::string Token::to_string() const
+{
     return token_kind_to_string(kind) + " (" + std::to_string(operand) + ")";
 }
 
-std::string Token::token_kind_to_string(Token::Kind kind) {
+std::string Token::token_kind_to_string(Token::Kind kind)
+{
     switch (kind)
     {
     case Token::Kind::EOF:
