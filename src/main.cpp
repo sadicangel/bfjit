@@ -1,5 +1,13 @@
+#include "Windows.h"
+
 import std;
 import bf;
+
+//void print() {
+//    char f[10]{};
+//    f[0] = 67;
+//    std::printf("%c", f[0]);
+//}
 
 int main(int argc, char* argv[])
 {
@@ -11,14 +19,14 @@ int main(int argc, char* argv[])
     // std::cout << "bf:\n" << content << "\n" << std::endl;
 
     auto lexer = bf::Lexer(content);
-    const auto tokens = lexer.lex(false);
+    lexer.lex(false);
 
-    auto interpreter = bf::Interpreter();
-    interpreter.interpret(tokens);
+    auto interpreter = bf::Interpreter(lexer);
+    interpreter.interpret();
 
-    auto jit = bf::Jit();
-    const auto code = jit.compile(tokens);
+    auto jit = bf::Jit(lexer);
+    jit.compile();
 
-    auto exec = bf::Exec(code);
+    auto exec = bf::Exec(jit);
     exec.run();
 }

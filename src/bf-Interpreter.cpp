@@ -2,14 +2,19 @@ module bf;
 
 using namespace bf;
 
-void Interpreter::interpret(const std::vector<Token>& tokens)
+Interpreter::Interpreter(const Lexer& lexer)
+    : _lexer(lexer), _memory(), _mp(0), _ip(0)
+{
+}
+
+void Interpreter::interpret()
 {
     _memory.clear();
     _memory.push_back(0);
     _mp = 0;
     _ip = 0;
-    while (_ip < tokens.size()) {
-        const auto& token = tokens[_ip];
+    while (_ip < _lexer.tokens.size()) {
+        const auto& token = _lexer.tokens[_ip];
         switch (token.kind)
         {
         

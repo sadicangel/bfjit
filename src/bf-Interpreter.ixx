@@ -1,6 +1,6 @@
 export module bf:Interpreter;
 
-import :Token;
+import :Lexer;
 
 import std;
 
@@ -11,21 +11,18 @@ namespace bf
     /// </summary>
     export class Interpreter
     {
+        Lexer _lexer;
         std::vector<size_t> _memory;
         size_t _mp;
         size_t _ip;
     
     public:
 
-        Interpreter()
-            : _memory(), _mp(0), _ip(0)
-        {
-        }
+        Interpreter(const Lexer& lexer);
 
         /// <summary>
         /// Interpret a collection of tokens.
         /// </summary>
-        /// <param name="tokens">A collection of parsed tokens to interpret.</param>
-        void interpret(const std::vector<Token>& tokens);
+        void interpret();
     };
 }

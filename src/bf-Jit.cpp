@@ -4,11 +4,12 @@ using namespace bf;
 
 import std;
 
-std::vector<std::uint8_t> Jit::compile(const std::vector<Token>& tokens)
+void Jit::compile()
 {
-    std::vector<std::uint8_t> code{};
+    _print_indices.clear();
+    code.clear();
 
-    for (const auto& token : tokens) {
+    for (const auto& token : _lexer.tokens) {
         switch (token.kind)
         {
         case Token::Kind::INC: {
@@ -46,6 +47,13 @@ std::vector<std::uint8_t> Jit::compile(const std::vector<Token>& tokens)
         case Token::Kind::IN: {
         } break;
         case Token::Kind::OUT: {
+            // call print
+            code.push_back(0xE8);
+            _print_indices.push_back(code.size());
+            code.push_back(0);
+            code.push_back(0);
+            code.push_back(0);
+            code.push_back(0);
         } break;
         case Token::Kind::JZ: {
         } break;
@@ -56,6 +64,26 @@ std::vector<std::uint8_t> Jit::compile(const std::vector<Token>& tokens)
 
     // ret
     code.push_back(0xC3);
+}
 
-    return code;
+static void asm_print(const char* memory)
+{
+    std::printf("%c", memory[0]);
+}
+
+void Jit::backpatch_calls(const std::intptr_t start)
+{
+    asm_print("C");
+    const void* fptr = &std::printf;
+    const std::intptr_t iptr = (std::intptr_t)fptr;
+    for (const auto& addr : _print_indices)
+    {
+        const std::intptr_t offset = start + static_cast<std::intptr_t>(addr);
+        const std::intptr_t rel32 = iptr - offset + 1;
+
+        code[addr + 0] = static_cast<std::uint8_t>((rel32 & 0x000000ff));
+        code[addr + 1] = static_cast<std::uint8_t>((rel32 & 0x0000ff00) >> 8);
+        code[addr + 2] = static_cast<std::uint8_t>((rel32 & 0x00ff0000) >> 16);
+        code[addr + 3] = static_cast<std::uint8_t>((rel32 & 0xff000000) >> 24);
+    }
 }

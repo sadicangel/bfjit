@@ -4,12 +4,17 @@ import std;
 
 using namespace bf;
 
-static constexpr std::string_view tokens = "+-<>.,[]";
+static constexpr std::string_view Allowed_Tokens = "+-<>.,[]";
+
+bf::Lexer::Lexer(const std::string_view& content)
+    : _content(content), _position(0), tokens(0)
+{
+}
 
 Token::Kind Lexer::next()
 {
     // Skip non valid tokens.
-    while (_position < _content.length() && tokens.find(_content[_position]) == std::string_view::npos) {
+    while (_position < _content.length() && Allowed_Tokens.find(_content[_position]) == std::string_view::npos) {
         ++_position;
     }
 
@@ -19,11 +24,11 @@ Token::Kind Lexer::next()
     return static_cast<Token::Kind>(_content[_position++]);
 }
 
-std::vector<Token> Lexer::lex(bool log)
+void Lexer::lex(bool log)
 {
-    std::stack<size_t> addresses{};
-    std::vector<Token> tokens{};
+    tokens.clear();
     _position = 0;
+    std::stack<size_t> addresses{};
     auto k = next();
     while (k != Token::Kind::EOF) {
         switch (k)
@@ -80,5 +85,4 @@ std::vector<Token> Lexer::lex(bool log)
             std::cout << i << ": " << tokens[i].to_string() << '\n';
         }
     }
-    return tokens;
 }
