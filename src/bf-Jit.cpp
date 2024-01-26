@@ -4,6 +4,11 @@ using namespace bf;
 
 import std;
 
+__declspec(noinline) static void asm_print(const char* memory)
+{
+    //std::printf(memory);
+}
+
 void Jit::compile()
 {
     _print_indices.clear();
@@ -47,13 +52,49 @@ void Jit::compile()
         case Token::Kind::IN: {
         } break;
         case Token::Kind::OUT: {
-            // call print
-            code.push_back(0xE8);
-            _print_indices.push_back(code.size());
+            // push rax
+            code.push_back(0x50);
+            //// push rbp
+            //code.push_back(0x55);
+            //// mov rbp, rsp
+            //code.push_back(0x48);
+            //code.push_back(0x89);
+            //code.push_back(0xE5);
+            //// sub rsp, 32 (shadow space)
+            //code.push_back(0x48);
+            //code.push_back(0x83);
+            //code.push_back(0xEC);
+            //code.push_back(0x30);
+            // mov rax, qword &asm_print
+            code.push_back(0x48);
+            code.push_back(0xB8);
+            const auto index = code.size();
             code.push_back(0);
             code.push_back(0);
             code.push_back(0);
             code.push_back(0);
+            code.push_back(0);
+            code.push_back(0);
+            code.push_back(0);
+            code.push_back(0);
+            auto vptr = reinterpret_cast<std::intptr_t*>(&code[index]);
+            *vptr = (std::intptr_t)&asm_print;
+            // call rax
+            code.push_back(0xFF);
+            code.push_back(0xD0);
+            // pop rax
+            code.push_back(0x58);
+            //// mov rsp, rbp
+            //code.push_back(0x48);
+            //code.push_back(0x89);
+            //code.push_back(0xEC);
+            //// pop rdp
+            //code.push_back(0x5D);
+#if _DEBUG
+            std::ios_base::fmtflags f(std::cout.flags());
+            std::cout << std::hex << *vptr << std::endl;
+            std::cout.flags(f);
+#endif
         } break;
         case Token::Kind::JZ: {
         } break;
@@ -66,24 +107,16 @@ void Jit::compile()
     code.push_back(0xC3);
 }
 
-static void asm_print(const char* memory)
+void Jit::dump(const std::size_t bytes_per_row)
 {
-    std::printf("%c", memory[0]);
-}
-
-void Jit::backpatch_calls(const std::intptr_t start)
-{
-    asm_print("C");
-    const void* fptr = &std::printf;
-    const std::intptr_t iptr = (std::intptr_t)fptr;
-    for (const auto& addr : _print_indices)
-    {
-        const std::intptr_t offset = start + static_cast<std::intptr_t>(addr);
-        const std::intptr_t rel32 = iptr - offset + 1;
-
-        code[addr + 0] = static_cast<std::uint8_t>((rel32 & 0x000000ff));
-        code[addr + 1] = static_cast<std::uint8_t>((rel32 & 0x0000ff00) >> 8);
-        code[addr + 2] = static_cast<std::uint8_t>((rel32 & 0x00ff0000) >> 16);
-        code[addr + 3] = static_cast<std::uint8_t>((rel32 & 0xff000000) >> 24);
+    std::ios_base::fmtflags f(std::cout.flags());
+    std::size_t i = 0;
+    std::cout << std::hex << std::setfill('0');
+    for (auto byte : code) {
+        if (i != 0 && i % bytes_per_row == 0)
+            std::cout << std::endl;
+        std::cout << std::setw(2) << (int)byte << ' ';
+        ++i;
     }
+    std::cout.flags(f);
 }

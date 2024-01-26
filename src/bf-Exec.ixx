@@ -20,5 +20,7 @@ namespace bf
         Exec& operator=(Exec&& other) noexcept;
 
         void run();
+
+        void dump(const std::size_t bytes_per_row = 16);
     };
 }

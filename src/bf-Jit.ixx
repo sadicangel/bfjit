@@ -21,6 +21,6 @@ namespace bf
 
         void compile();
 
-        void backpatch_calls(const std::intptr_t start);
+        void dump(const std::size_t bytes_per_row = 16);
     };
 }

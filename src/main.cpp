@@ -3,10 +3,9 @@
 import std;
 import bf;
 
-//void print() {
-//    char f[10]{};
-//    f[0] = 67;
-//    std::printf("%c", f[0]);
+//__declspec(noinline) void print(const char* o) {
+//    
+//    std::printf(o);
 //}
 
 int main(int argc, char* argv[])
