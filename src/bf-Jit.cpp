@@ -4,11 +4,6 @@ using namespace bf;
 
 import std;
 
-__declspec(noinline) static void asm_print(const char* memory)
-{
-    std::printf("%c", memory[0]);
-}
-
 void Jit::compile()
 {
     _print_indices.clear();
@@ -49,11 +44,7 @@ void Jit::compile()
             code.push_back(static_cast<std::uint8_t>((token.operand & 0x00ff0000) >> 16));
             code.push_back(static_cast<std::uint8_t>((token.operand & 0xff000000) >> 24));
         } break;
-        case Token::Kind::IN: {
-        } break;
         case Token::Kind::OUT: {
-            // push rax 
-            code.push_back(0x50);
             // push rcx
             code.push_back(0x51);
             // sub rsp, 56
@@ -74,7 +65,7 @@ void Jit::compile()
             code.push_back(0);
             code.push_back(0);
             auto vptr = reinterpret_cast<std::intptr_t*>(&code[index]);
-            *vptr = (std::intptr_t)&asm_print;
+            *vptr = (std::intptr_t)&Win32Interop::write;
             // call rax
             code.push_back(0xFF);
             code.push_back(0xD0);
@@ -85,8 +76,39 @@ void Jit::compile()
             code.push_back(0x38);
             // pop rcx 
             code.push_back(0x59);
-            // pop rax 
-            code.push_back(0x58);
+        } break;
+        case Token::Kind::IN: {
+            // push rcx
+            code.push_back(0x51);
+            // sub rsp, 56
+            code.push_back(0x48);
+            code.push_back(0x83);
+            code.push_back(0xEC);
+            code.push_back(0x38);
+            // mov rax, qword &asm_print
+            code.push_back(0x48);
+            code.push_back(0xB8);
+            const auto index = code.size();
+            code.push_back(0);
+            code.push_back(0);
+            code.push_back(0);
+            code.push_back(0);
+            code.push_back(0);
+            code.push_back(0);
+            code.push_back(0);
+            code.push_back(0);
+            auto vptr = reinterpret_cast<std::intptr_t*>(&code[index]);
+            *vptr = (std::intptr_t)&Win32Interop::read;
+            // call rax
+            code.push_back(0xFF);
+            code.push_back(0xD0);
+            // add rsp, 56
+            code.push_back(0x48);
+            code.push_back(0x83);
+            code.push_back(0xC4);
+            code.push_back(0x38);
+            // pop rcx 
+            code.push_back(0x59);
         } break;
         case Token::Kind::JZ: {
         } break;

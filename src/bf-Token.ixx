@@ -11,10 +11,10 @@ namespace bf
             EOF = 0,
             INC = '+',
             DEC = '-',
-            LEFT = '<',
             RIGHT = '>',
-            IN = ',',
+            LEFT = '<',
             OUT = '.',
+            IN = ',',
             JZ = '[',
             JNZ = ']'
         };

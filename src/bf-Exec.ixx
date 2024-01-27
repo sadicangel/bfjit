@@ -9,8 +9,6 @@ namespace bf
         Jit _jit;
         void* _exec;
 
-        static std::string GetLastErrorAsString();
-
     public:
         Exec(const bf::Jit jit);
         ~Exec();
@@ -19,7 +17,7 @@ namespace bf
         Exec& operator=(const Exec& other) = delete;
         Exec& operator=(Exec&& other) noexcept;
 
-        void run();
+        __declspec(noinline) void run();
 
         void dump(const std::size_t bytes_per_row = 16);
     };

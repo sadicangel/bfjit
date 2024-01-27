@@ -6,3 +6,4 @@ export import :Interpreter;
 export import :Jit;
 export import :Lexer;
 export import :Token;
+export import :Win32Interop;

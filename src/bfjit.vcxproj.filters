@@ -54,5 +54,11 @@
     <ClCompile Include="bf-Exec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="bf-Win32Interop.ixx">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bf-Win32Interop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -8,12 +8,13 @@ module bf;
 
 using namespace bf;
 
+
 Exec::Exec(const Jit jit)
     : _jit(jit), _exec(nullptr)
 {
     _exec = VirtualAlloc(nullptr, jit.code.size(), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     if (_exec == nullptr) {
-        throw std::runtime_error(GetLastErrorAsString());
+        throw std::runtime_error(Win32Interop::GetLastErrorAsString());
     }
 
     memcpy(_exec, jit.code.data(), jit.code.size());
@@ -42,12 +43,12 @@ Exec& Exec::operator=(Exec&& other) noexcept
     return *this;
 }
 
-__declspec(noinline) void Exec::run()
+void Exec::run()
 {
     DWORD protect = 0;
     const auto error = VirtualProtect(_exec, _jit.code.size(), PAGE_EXECUTE, &protect);
     if (error == ERROR) {
-        throw std::runtime_error(GetLastErrorAsString());
+        throw std::runtime_error(Win32Interop::GetLastErrorAsString());
     }
 
     std::vector<unsigned char> mem(10 * 1024 * 1024);
@@ -61,25 +62,6 @@ __declspec(noinline) void Exec::run()
     func(mem.data());
 
     VirtualProtect(_exec, _jit.code.size(), protect, &protect);
-}
-
-std::string Exec::GetLastErrorAsString()
-{
-    DWORD error_jit = GetLastError();
-    if (error_jit == 0) {
-        return "unknown error";
-    }
-
-    LPSTR buffer = nullptr;
-
-    size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL, error_jit, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&buffer, 0, NULL);
-
-    std::string message(buffer, size);
-
-    LocalFree(buffer);
-
-    return message;
 }
 
 void Exec::dump(const std::size_t bytes_per_row)

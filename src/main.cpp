@@ -5,7 +5,7 @@ import bf;
 
 int main(int argc, char* argv[])
 {
-    std::string_view content = bf::Examples::alphabet;
+    std::string_view content = ",.";//bf::Examples::alphabet;
     if (argc > 1) {
         std::ifstream in(argv[1]);
         content = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
