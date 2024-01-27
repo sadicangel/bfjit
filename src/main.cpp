@@ -3,14 +3,9 @@
 import std;
 import bf;
 
-//__declspec(noinline) void print(const char* o) {
-//    
-//    std::printf(o);
-//}
-
 int main(int argc, char* argv[])
 {
-    std::string_view content = bf::Examples::hello_world;
+    std::string_view content = bf::Examples::alphabet;
     if (argc > 1) {
         std::ifstream in(argv[1]);
         content = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
@@ -22,6 +17,8 @@ int main(int argc, char* argv[])
 
     auto interpreter = bf::Interpreter(lexer);
     interpreter.interpret();
+
+    std::cout << std::endl;
 
     auto jit = bf::Jit(lexer);
     jit.compile();

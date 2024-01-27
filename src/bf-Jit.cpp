@@ -6,7 +6,7 @@ import std;
 
 __declspec(noinline) static void asm_print(const char* memory)
 {
-    //std::printf(memory);
+    std::printf("%c", memory[0]);
 }
 
 void Jit::compile()
@@ -52,19 +52,15 @@ void Jit::compile()
         case Token::Kind::IN: {
         } break;
         case Token::Kind::OUT: {
-            // push rax
+            // push rax 
             code.push_back(0x50);
-            //// push rbp
-            //code.push_back(0x55);
-            //// mov rbp, rsp
-            //code.push_back(0x48);
-            //code.push_back(0x89);
-            //code.push_back(0xE5);
-            //// sub rsp, 32 (shadow space)
-            //code.push_back(0x48);
-            //code.push_back(0x83);
-            //code.push_back(0xEC);
-            //code.push_back(0x30);
+            // push rcx
+            code.push_back(0x51);
+            // sub rsp, 56
+            code.push_back(0x48);
+            code.push_back(0x83);
+            code.push_back(0xEC);
+            code.push_back(0x38);
             // mov rax, qword &asm_print
             code.push_back(0x48);
             code.push_back(0xB8);
@@ -82,19 +78,15 @@ void Jit::compile()
             // call rax
             code.push_back(0xFF);
             code.push_back(0xD0);
-            // pop rax
+            // add rsp, 56
+            code.push_back(0x48);
+            code.push_back(0x83);
+            code.push_back(0xC4);
+            code.push_back(0x38);
+            // pop rcx 
+            code.push_back(0x59);
+            // pop rax 
             code.push_back(0x58);
-            //// mov rsp, rbp
-            //code.push_back(0x48);
-            //code.push_back(0x89);
-            //code.push_back(0xEC);
-            //// pop rdp
-            //code.push_back(0x5D);
-#if _DEBUG
-            std::ios_base::fmtflags f(std::cout.flags());
-            std::cout << std::hex << *vptr << std::endl;
-            std::cout.flags(f);
-#endif
         } break;
         case Token::Kind::JZ: {
         } break;

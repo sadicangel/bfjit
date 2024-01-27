@@ -41,6 +41,8 @@ namespace bf {
             "32 >>+.                    Add 1 to Cell #5 gives us an exclamation point\n"
             "33 >++.                    And finally a newline from Cell #6\n";
 
+        static constexpr std::string_view alphabet = "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++.+.+.+.+.+.+.+.+.+.+.+.+.+.+.+.+.+.+.+.+.+.+.+.+.+.+";
+
         static constexpr std::string_view cat = ",[.[-],]";
 
         static constexpr std::string_view mandelbrot =
