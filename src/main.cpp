@@ -5,7 +5,7 @@ import bf;
 
 int main(int argc, char* argv[])
 {
-    std::string_view content = ",.";//bf::Examples::alphabet;
+    std::string_view content = bf::Examples::hello_world;
     if (argc > 1) {
         std::ifstream in(argv[1]);
         content = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
@@ -15,10 +15,10 @@ int main(int argc, char* argv[])
     auto lexer = bf::Lexer(content);
     lexer.lex(false);
 
-    auto interpreter = bf::Interpreter(lexer);
-    interpreter.interpret();
+    //auto interpreter = bf::Interpreter(lexer);
+    //interpreter.interpret();
 
-    std::cout << std::endl;
+    //std::cout << std::endl;
 
     auto jit = bf::Jit(lexer);
     jit.compile();

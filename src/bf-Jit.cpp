@@ -4,12 +4,24 @@ using namespace bf;
 
 import std;
 
+struct Jump
+{
+    std::size_t src_index;
+    std::size_t operand_index;
+    std::size_t operand_value;
+};
+
 void Jit::compile()
 {
     _print_indices.clear();
     code.clear();
 
+    // token index -> code index
+    std::vector<std::size_t> addresses{};
+    std::vector<Jump> jumps{};
+
     for (const auto& token : _lexer.tokens) {
+        addresses.push_back(code.size());
         switch (token.kind)
         {
         case Token::Kind::INC: {
@@ -111,14 +123,60 @@ void Jit::compile()
             code.push_back(0x59);
         } break;
         case Token::Kind::JZ: {
+            Jump jump{ .operand_value = token.operand };
+            
+            // mov al, byte[rcx]
+            code.push_back(0x8A);
+            code.push_back(0x01);
+            // test al, al
+            code.push_back(0x84);
+            code.push_back(0xC0);
+            // jz qword 0x00000000
+            code.push_back(0x0F);
+            code.push_back(0x84);
+            jump.operand_index = code.size();
+            code.push_back(0x00);
+            code.push_back(0x00);
+            code.push_back(0x00);
+            code.push_back(0x00);
+            jump.src_index = code.size();
+
+            jumps.push_back(jump);
         } break;
         case Token::Kind::JNZ: {
+            Jump jump{ .operand_value = token.operand };
+
+            // mov al, byte[rcx]
+            code.push_back(0x8A);
+            code.push_back(0x01);
+            // test al, al
+            code.push_back(0x84);
+            code.push_back(0xC0);
+            // jz qword 0x00000000
+            code.push_back(0x0F);
+            code.push_back(0x85);
+            jump.operand_index = code.size();
+            code.push_back(0x00);
+            code.push_back(0x00);
+            code.push_back(0x00);
+            code.push_back(0x00);
+            jump.src_index = code.size();
+
+            jumps.push_back(jump);
         } break;
         }
     }
-
     // ret
+    addresses.push_back(_lexer.tokens.size());
     code.push_back(0xC3);
+
+    // Backpatch jumps.
+    for (auto& jump : jumps) {
+        auto src = static_cast<std::int32_t>(jump.src_index);
+        auto dst = static_cast<std::int32_t>(addresses[jump.operand_value]);
+        auto ptr = reinterpret_cast<std::int32_t*>(&code[jump.operand_index]);
+        *ptr = dst - src;
+    }
 }
 
 void Jit::dump(const std::size_t bytes_per_row)

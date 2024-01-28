@@ -13,6 +13,8 @@ namespace bf
     {
         static HANDLE stdout_handle();
         static HANDLE stdin_handle();
+
+        static void write_many(const char* memory, const auto length);
     public:
         __declspec(noinline) static void write(const char* memory);
         __declspec(noinline) static void read(char* memory);
