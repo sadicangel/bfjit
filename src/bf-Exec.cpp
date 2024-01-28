@@ -1,7 +1,7 @@
 module;
-#if _WIN32 // Windows - Use VirtualAlloc
+#if _WIN32
 #include "Windows.h"
-#else // Use mmap
+#else
 #error platform not supported
 #endif
 module bf;

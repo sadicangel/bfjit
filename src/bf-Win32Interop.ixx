@@ -1,5 +1,5 @@
 module;
-#if _WIN32 // Windows - Use VirtualAlloc
+#if _WIN32 // Windows
 #include "Windows.h"
 #endif
 export module bf:Win32Interop;

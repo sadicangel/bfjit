@@ -1,3 +1,7 @@
+module;
+#if !_WIN32
+#error platform not supported
+#endif
 module bf;
 
 using namespace bf;
@@ -26,66 +30,37 @@ void Jit::compile()
         {
         case Token::Kind::INC: {
             // add byte[rcx], <operand>
-            code.push_back(0x80);
-            code.push_back(0x01);
-            code.push_back(static_cast<std::uint8_t>(token.operand & 0xFF));
+            code.insert(code.end(), { 0x80, 0x01, static_cast<std::uint8_t>(token.operand & 0xFF) });
         } break;
         case Token::Kind::DEC: {
             // sub byte[rcx], <operand>
-            code.push_back(0x80);
-            code.push_back(0x29);
-            code.push_back(static_cast<std::uint8_t>(token.operand & 0xFF));
+            code.insert(code.end(), { 0x80, 0x29, static_cast<std::uint8_t>(token.operand & 0xFF) });
         } break;
         case Token::Kind::RIGHT: {
             // add rcx, <operand>
-            code.push_back(0x48);
-            code.push_back(0x81);
-            code.push_back(0xC1);
-            code.push_back(static_cast<std::uint8_t>((token.operand & 0x000000ff)));
-            code.push_back(static_cast<std::uint8_t>((token.operand & 0x0000ff00) >> 8));
-            code.push_back(static_cast<std::uint8_t>((token.operand & 0x00ff0000) >> 16));
-            code.push_back(static_cast<std::uint8_t>((token.operand & 0xff000000) >> 24));
+            code.insert(code.end(), { 0x48, 0x81, 0xC1, 0x00, 0x00, 0x00, 0x00 });
+            auto ptr = reinterpret_cast<std::int32_t*>(&code[code.size() - sizeof(std::int32_t)]);
+            *ptr = static_cast<std::int32_t>(token.operand);
         } break;
         case Token::Kind::LEFT: {
             // sub rcx, <operand>
-            code.push_back(0x48);
-            code.push_back(0x81);
-            code.push_back(0xE9);
-            code.push_back(static_cast<std::uint8_t>((token.operand & 0x000000ff)));
-            code.push_back(static_cast<std::uint8_t>((token.operand & 0x0000ff00) >> 8));
-            code.push_back(static_cast<std::uint8_t>((token.operand & 0x00ff0000) >> 16));
-            code.push_back(static_cast<std::uint8_t>((token.operand & 0xff000000) >> 24));
+            code.insert(code.end(), { 0x48, 0x81, 0xE9, 0x00, 0x00, 0x00, 0x00 });
+            auto ptr = reinterpret_cast<std::int32_t*>(&code[code.size() - sizeof(std::int32_t)]);
+            *ptr = static_cast<std::int32_t>(token.operand);
         } break;
         case Token::Kind::OUT: {
             // push rcx
             code.push_back(0x51);
             // sub rsp, 56
-            code.push_back(0x48);
-            code.push_back(0x83);
-            code.push_back(0xEC);
-            code.push_back(0x38);
-            // mov rax, qword &asm_print
-            code.push_back(0x48);
-            code.push_back(0xB8);
-            const auto index = code.size();
-            code.push_back(0);
-            code.push_back(0);
-            code.push_back(0);
-            code.push_back(0);
-            code.push_back(0);
-            code.push_back(0);
-            code.push_back(0);
-            code.push_back(0);
-            auto vptr = reinterpret_cast<std::intptr_t*>(&code[index]);
-            *vptr = (std::intptr_t)&Win32Interop::write;
+            code.insert(code.end(), { 0x48, 0x83, 0xEC, 0x38 });
+            // mov rax, qword &Win32Interop::write
+            code.insert(code.end(), { 0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
+            auto ptr = reinterpret_cast<std::intptr_t*>(&code[code.size() - sizeof(std::intptr_t)]);
+            *ptr = (std::intptr_t)&Win32Interop::write;
             // call rax
-            code.push_back(0xFF);
-            code.push_back(0xD0);
+            code.insert(code.end(), { 0xFF, 0xD0 });
             // add rsp, 56
-            code.push_back(0x48);
-            code.push_back(0x83);
-            code.push_back(0xC4);
-            code.push_back(0x38);
+            code.insert(code.end(), { 0x48, 0x83, 0xC4, 0x38 });
             // pop rcx 
             code.push_back(0x59);
         } break;
@@ -93,76 +68,45 @@ void Jit::compile()
             // push rcx
             code.push_back(0x51);
             // sub rsp, 56
-            code.push_back(0x48);
-            code.push_back(0x83);
-            code.push_back(0xEC);
-            code.push_back(0x38);
-            // mov rax, qword &asm_print
-            code.push_back(0x48);
-            code.push_back(0xB8);
-            const auto index = code.size();
-            code.push_back(0);
-            code.push_back(0);
-            code.push_back(0);
-            code.push_back(0);
-            code.push_back(0);
-            code.push_back(0);
-            code.push_back(0);
-            code.push_back(0);
-            auto vptr = reinterpret_cast<std::intptr_t*>(&code[index]);
-            *vptr = (std::intptr_t)&Win32Interop::read;
+            code.insert(code.end(), { 0x48, 0x83, 0xEC, 0x38 });
+            // mov rax, qword &Win32Interop::read
+            code.insert(code.end(), { 0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
+            auto ptr = reinterpret_cast<std::intptr_t*>(&code[code.size() - sizeof(std::intptr_t)]);
+            *ptr = (std::intptr_t)&Win32Interop::read;
             // call rax
-            code.push_back(0xFF);
-            code.push_back(0xD0);
+            code.insert(code.end(), { 0xFF, 0xD0 });
             // add rsp, 56
-            code.push_back(0x48);
-            code.push_back(0x83);
-            code.push_back(0xC4);
-            code.push_back(0x38);
+            code.insert(code.end(), { 0x48, 0x83, 0xC4, 0x38 });
             // pop rcx 
             code.push_back(0x59);
         } break;
         case Token::Kind::JZ: {
-            Jump jump{ .operand_value = token.operand };
-            
             // mov al, byte[rcx]
-            code.push_back(0x8A);
-            code.push_back(0x01);
+            code.insert(code.end(), { 0x8A, 0x01 });
             // test al, al
-            code.push_back(0x84);
-            code.push_back(0xC0);
-            // jz qword 0x00000000
-            code.push_back(0x0F);
-            code.push_back(0x84);
-            jump.operand_index = code.size();
-            code.push_back(0x00);
-            code.push_back(0x00);
-            code.push_back(0x00);
-            code.push_back(0x00);
-            jump.src_index = code.size();
+            code.insert(code.end(), { 0x84, 0xC0 });
+            // jz qword <dst_addr - src_addr>
+            code.insert(code.end(), { 0x0F, 0x84, 0x00, 0x00, 0x00, 0x00 });
 
-            jumps.push_back(jump);
+            jumps.push_back({
+                .src_index = code.size(),
+                .operand_index = code.size() - sizeof(std::int32_t),
+                .operand_value = token.operand,
+            });
         } break;
         case Token::Kind::JNZ: {
-            Jump jump{ .operand_value = token.operand };
-
             // mov al, byte[rcx]
-            code.push_back(0x8A);
-            code.push_back(0x01);
+            code.insert(code.end(), { 0x8A, 0x01 });
             // test al, al
-            code.push_back(0x84);
-            code.push_back(0xC0);
-            // jz qword 0x00000000
-            code.push_back(0x0F);
-            code.push_back(0x85);
-            jump.operand_index = code.size();
-            code.push_back(0x00);
-            code.push_back(0x00);
-            code.push_back(0x00);
-            code.push_back(0x00);
-            jump.src_index = code.size();
+            code.insert(code.end(), { 0x84, 0xC0 });
+            // jnz qword <dst_addr - src_addr>
+            code.insert(code.end(), { 0x0F, 0x85, 0x00, 0x00, 0x00, 0x00 });
 
-            jumps.push_back(jump);
+            jumps.push_back({
+                .src_index = code.size(),
+                .operand_index = code.size() - sizeof(std::int32_t),
+                .operand_value = token.operand,
+                });
         } break;
         }
     }
