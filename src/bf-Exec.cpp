@@ -51,7 +51,7 @@ void Exec::run()
         throw std::runtime_error(Win32Interop::GetLastErrorAsString());
     }
 
-    std::vector<unsigned char> mem(10 * 1024 * 1024);
+    std::vector<unsigned char> mem(_jit.memory_size_required);
 
     //_jit.dump();
     //std::cout << std::endl;

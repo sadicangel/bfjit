@@ -9,15 +9,11 @@ namespace bf
     export class Jit
     {
         Lexer _lexer;
-        std::vector<std::size_t> _print_indices;
     public:
-        Jit(const Lexer& lexer) :
-            _lexer(lexer), code(), _print_indices()
-        {
-
-        }
+        Jit(const Lexer& lexer);
 
         std::vector<std::uint8_t> code;
+        size_t memory_size_required;
 
         void compile();
 

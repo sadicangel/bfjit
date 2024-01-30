@@ -15,10 +15,15 @@ struct Jump
     std::size_t operand_value;
 };
 
+Jit::Jit(const Lexer& lexer)
+    : _lexer(lexer), code(), memory_size_required(0)
+{
+}
+
 void Jit::compile()
 {
-    _print_indices.clear();
     code.clear();
+    memory_size_required = 0;
 
     // token index -> code index
     std::vector<std::size_t> addresses{};
@@ -41,44 +46,50 @@ void Jit::compile()
             code.insert(code.end(), { 0x48, 0x81, 0xC1, 0x00, 0x00, 0x00, 0x00 });
             auto ptr = reinterpret_cast<std::int32_t*>(&code[code.size() - sizeof(std::int32_t)]);
             *ptr = static_cast<std::int32_t>(token.operand);
+            memory_size_required += token.operand;
         } break;
         case Token::Kind::LEFT: {
             // sub rcx, <operand>
             code.insert(code.end(), { 0x48, 0x81, 0xE9, 0x00, 0x00, 0x00, 0x00 });
             auto ptr = reinterpret_cast<std::int32_t*>(&code[code.size() - sizeof(std::int32_t)]);
             *ptr = static_cast<std::int32_t>(token.operand);
+            memory_size_required -= token.operand;
         } break;
         case Token::Kind::OUT: {
-            // push rcx
-            code.push_back(0x51);
-            // sub rsp, 56
-            code.insert(code.end(), { 0x48, 0x83, 0xEC, 0x38 });
-            // mov rax, qword &Win32Interop::write
-            code.insert(code.end(), { 0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
-            auto ptr = reinterpret_cast<std::intptr_t*>(&code[code.size() - sizeof(std::intptr_t)]);
-            *ptr = (std::intptr_t)&Win32Interop::write;
-            // call rax
-            code.insert(code.end(), { 0xFF, 0xD0 });
-            // add rsp, 56
-            code.insert(code.end(), { 0x48, 0x83, 0xC4, 0x38 });
-            // pop rcx 
-            code.push_back(0x59);
+            for (std::size_t i = 0; i < token.operand; ++i) {
+                // push rcx
+                code.push_back(0x51);
+                // sub rsp, 56
+                code.insert(code.end(), { 0x48, 0x83, 0xEC, 0x38 });
+                // mov rax, qword &Win32Interop::write
+                code.insert(code.end(), { 0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
+                auto ptr = reinterpret_cast<std::intptr_t*>(&code[code.size() - sizeof(std::intptr_t)]);
+                *ptr = (std::intptr_t)&Win32Interop::write;
+                // call rax
+                code.insert(code.end(), { 0xFF, 0xD0 });
+                // add rsp, 56
+                code.insert(code.end(), { 0x48, 0x83, 0xC4, 0x38 });
+                // pop rcx 
+                code.push_back(0x59);
+            }
         } break;
         case Token::Kind::IN: {
-            // push rcx
-            code.push_back(0x51);
-            // sub rsp, 56
-            code.insert(code.end(), { 0x48, 0x83, 0xEC, 0x38 });
-            // mov rax, qword &Win32Interop::read
-            code.insert(code.end(), { 0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
-            auto ptr = reinterpret_cast<std::intptr_t*>(&code[code.size() - sizeof(std::intptr_t)]);
-            *ptr = (std::intptr_t)&Win32Interop::read;
-            // call rax
-            code.insert(code.end(), { 0xFF, 0xD0 });
-            // add rsp, 56
-            code.insert(code.end(), { 0x48, 0x83, 0xC4, 0x38 });
-            // pop rcx 
-            code.push_back(0x59);
+            for (std::size_t i = 0; i < token.operand; ++i) {
+                // push rcx
+                code.push_back(0x51);
+                // sub rsp, 56
+                code.insert(code.end(), { 0x48, 0x83, 0xEC, 0x38 });
+                // mov rax, qword &Win32Interop::read
+                code.insert(code.end(), { 0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
+                auto ptr = reinterpret_cast<std::intptr_t*>(&code[code.size() - sizeof(std::intptr_t)]);
+                *ptr = (std::intptr_t)&Win32Interop::read;
+                // call rax
+                code.insert(code.end(), { 0xFF, 0xD0 });
+                // add rsp, 56
+                code.insert(code.end(), { 0x48, 0x83, 0xC4, 0x38 });
+                // pop rcx 
+                code.push_back(0x59);
+            }
         } break;
         case Token::Kind::JZ: {
             // mov al, byte[rcx]
@@ -92,7 +103,7 @@ void Jit::compile()
                 .src_index = code.size(),
                 .operand_index = code.size() - sizeof(std::int32_t),
                 .operand_value = token.operand,
-            });
+                });
         } break;
         case Token::Kind::JNZ: {
             // mov al, byte[rcx]
