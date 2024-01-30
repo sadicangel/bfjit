@@ -75,9 +75,6 @@ void Interpreter::interpret()
                 _ip += 1;
             }
         } break;
-
-        default:
-            break;
         }
     }
 }

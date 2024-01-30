@@ -39,10 +39,12 @@ void Jit::compile()
             // add byte[rcx], <operand>
             code.insert(code.end(), { 0x80, 0x01, static_cast<std::uint8_t>(token.operand & 0xFF) });
         } break;
+
         case Token::Kind::DEC: {
             // sub byte[rcx], <operand>
             code.insert(code.end(), { 0x80, 0x29, static_cast<std::uint8_t>(token.operand & 0xFF) });
         } break;
+
         case Token::Kind::RIGHT: {
             // add rcx, <operand>
             code.insert(code.end(), { 0x48, 0x81, 0xC1, 0x00, 0x00, 0x00, 0x00 });
@@ -50,6 +52,7 @@ void Jit::compile()
             *ptr = static_cast<std::int32_t>(token.operand);
             memory_size_required += token.operand;
         } break;
+
         case Token::Kind::LEFT: {
             // sub rcx, <operand>
             code.insert(code.end(), { 0x48, 0x81, 0xE9, 0x00, 0x00, 0x00, 0x00 });
@@ -57,6 +60,7 @@ void Jit::compile()
             *ptr = static_cast<std::int32_t>(token.operand);
             memory_size_required -= token.operand;
         } break;
+
         case Token::Kind::STDOUT: {
             for (std::size_t i = 0; i < token.operand; ++i) {
                 // push rcx
@@ -101,6 +105,7 @@ void Jit::compile()
                 code.push_back(0x59);
             }
         } break;
+
         case Token::Kind::STDIN: {
             for (std::size_t i = 0; i < token.operand; ++i) {
                 // push rcx
@@ -113,8 +118,8 @@ void Jit::compile()
                 code.insert(code.end(), { 0x48, 0x89, 0xCB });
                 // mov ecx, STD_INPUT_HANDLE
                 code.insert(code.end(), { 0xB9, 0x00, 0x00, 0x00, 0x00 });
-                const auto std_output_handle = reinterpret_cast<std::int32_t*>(&code[code.size() - sizeof(std::uint32_t)]);
-                *std_output_handle = STD_INPUT_HANDLE;
+                const auto std_input_handle = reinterpret_cast<std::int32_t*>(&code[code.size() - sizeof(std::uint32_t)]);
+                *std_input_handle = STD_INPUT_HANDLE;
                 // mov rax, qword &GetStdHandle
                 code.insert(code.end(), { 0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
                 const auto get_std_handle = reinterpret_cast<std::intptr_t*>(&code[code.size() - sizeof(std::intptr_t)]);
@@ -145,6 +150,7 @@ void Jit::compile()
                 code.push_back(0x59);
             }
         } break;
+
         case Token::Kind::JZ: {
             // mov al, byte[rcx]
             code.insert(code.end(), { 0x8A, 0x01 });
@@ -159,6 +165,7 @@ void Jit::compile()
                 .operand_value = token.operand,
                 });
         } break;
+
         case Token::Kind::JNZ: {
             // mov al, byte[rcx]
             code.insert(code.end(), { 0x8A, 0x01 });
@@ -175,6 +182,7 @@ void Jit::compile()
         } break;
         }
     }
+
     // ret
     addresses.push_back(_lexer.tokens.size());
     code.push_back(0xC3);
