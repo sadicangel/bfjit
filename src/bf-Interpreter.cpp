@@ -44,14 +44,14 @@ void Interpreter::interpret()
             ++_ip;
         } break;
 
-        case Token::Kind::IN: {
+        case Token::Kind::STDIN: {
             for (size_t i = 0; i < token.operand; ++i) {
                 std::copy_n(std::istream_iterator<char>(std::cin), token.operand, _memory.begin());
             }
             ++_ip;
         } break;
 
-        case Token::Kind::OUT: {
+        case Token::Kind::STDOUT: {
             for (size_t i = 0; i < token.operand; ++i) {
                 std::cout << static_cast<char>(_memory[_mp]);
             }

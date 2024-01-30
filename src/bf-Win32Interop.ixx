@@ -16,7 +16,6 @@ namespace bf
 
         static void write_many(const char* memory, const auto length);
     public:
-        __declspec(noinline) static void write(const char* memory);
         __declspec(noinline) static void read(char* memory);
         static std::string GetLastErrorAsString();
     };

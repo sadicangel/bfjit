@@ -37,8 +37,8 @@ void Lexer::lex(bool log)
         case Token::Kind::DEC:
         case Token::Kind::RIGHT:
         case Token::Kind::LEFT:
-        case Token::Kind::IN:
-        case Token::Kind::OUT: {
+        case Token::Kind::STDIN:
+        case Token::Kind::STDOUT: {
             size_t count = 1;
             auto s = next();
             while (s == k) {

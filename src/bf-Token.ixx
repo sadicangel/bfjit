@@ -13,8 +13,8 @@ namespace bf
             DEC = '-',
             RIGHT = '>',
             LEFT = '<',
-            OUT = '.',
-            IN = ',',
+            STDOUT = '.',
+            STDIN = ',',
             JZ = '[',
             JNZ = ']'
         };

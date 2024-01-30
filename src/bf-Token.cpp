@@ -23,9 +23,9 @@ std::string Token::token_kind_to_string(Token::Kind kind)
         return "LEFT";
     case Token::Kind::RIGHT:
         return "RIGHT";
-    case Token::Kind::IN:
+    case Token::Kind::STDIN:
         return "IN";
-    case Token::Kind::OUT:
+    case Token::Kind::STDOUT:
         return "OUT";
     case Token::Kind::JZ:
         return "JZ";

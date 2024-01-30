@@ -34,15 +34,6 @@ void Win32Interop::write_many(const char* memory, const auto length)
     }
 }
 
-void Win32Interop::write(const char* memory)
-{
-    static const auto stdout = stdout_handle();
-    LPDWORD written = nullptr;
-    if (!WriteConsoleA(stdout, memory, 1, written, 0)) {
-        throw std::runtime_error(GetLastErrorAsString());
-    }
-}
-
 void Win32Interop::read(char* memory)
 {
     static const auto stdin = stdin_handle();

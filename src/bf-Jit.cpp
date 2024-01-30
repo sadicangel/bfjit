@@ -1,5 +1,7 @@
 module;
-#if !_WIN32
+#if _WIN32
+#include "Windows.h"
+#else
 #error platform not supported
 #endif
 module bf;
@@ -16,14 +18,14 @@ struct Jump
 };
 
 Jit::Jit(const Lexer& lexer)
-    : _lexer(lexer), code(), memory_size_required(0)
+    : _lexer(lexer), code(), memory_size_required(1)
 {
 }
 
 void Jit::compile()
 {
     code.clear();
-    memory_size_required = 0;
+    memory_size_required = 1;
 
     // token index -> code index
     std::vector<std::size_t> addresses{};
@@ -51,29 +53,55 @@ void Jit::compile()
         case Token::Kind::LEFT: {
             // sub rcx, <operand>
             code.insert(code.end(), { 0x48, 0x81, 0xE9, 0x00, 0x00, 0x00, 0x00 });
-            auto ptr = reinterpret_cast<std::int32_t*>(&code[code.size() - sizeof(std::int32_t)]);
+            const auto ptr = reinterpret_cast<std::int32_t*>(&code[code.size() - sizeof(std::int32_t)]);
             *ptr = static_cast<std::int32_t>(token.operand);
             memory_size_required -= token.operand;
         } break;
-        case Token::Kind::OUT: {
+        case Token::Kind::STDOUT: {
             for (std::size_t i = 0; i < token.operand; ++i) {
                 // push rcx
                 code.push_back(0x51);
+                // push rbx
+                code.push_back(0x53);
                 // sub rsp, 56
                 code.insert(code.end(), { 0x48, 0x83, 0xEC, 0x38 });
-                // mov rax, qword &Win32Interop::write
+                // mov rbx, rcx
+                code.insert(code.end(), { 0x48, 0x89, 0xCB });
+                // mov ecx, STD_OUTPUT_HANDLE
+                code.insert(code.end(), { 0xB9, 0x00, 0x00, 0x00, 0x00 });
+                const auto std_output_handle = reinterpret_cast<std::int32_t*>(&code[code.size() - sizeof(std::uint32_t)]);
+                *std_output_handle = STD_OUTPUT_HANDLE;
+                // mov rax, qword &GetStdHandle
                 code.insert(code.end(), { 0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
-                auto ptr = reinterpret_cast<std::intptr_t*>(&code[code.size() - sizeof(std::intptr_t)]);
-                *ptr = (std::intptr_t)&Win32Interop::write;
+                const auto get_std_handle = reinterpret_cast<std::intptr_t*>(&code[code.size() - sizeof(std::intptr_t)]);
+                *get_std_handle = (std::intptr_t)&GetStdHandle;
+                // call rax
+                code.insert(code.end(), { 0xFF, 0xD0 });
+                // xor r9d, r9d
+                code.insert(code.end(), { 0x45, 0x31, 0xC9 });
+                // mov qword [rsp + 32], 0
+                code.insert(code.end(), { 0x48, 0xC7, 0x44, 0x24, 0x20, 0x00, 0x00, 0x00, 0x00 });
+                // mov rdx, rbx 
+                code.insert(code.end(), { 0x48, 0x89, 0xDA });
+                // mov rcx, rax
+                code.insert(code.end(), { 0x48, 0x89, 0xC1 });
+                // lea r8d, [r9 + 1]
+                code.insert(code.end(), { 0x45, 0x8D, 0x41, 0x01 });
+                // mov rax, qword &WriteConsoleA
+                code.insert(code.end(), { 0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
+                const auto write_console = reinterpret_cast<std::intptr_t*>(&code[code.size() - sizeof(std::intptr_t)]);
+                *write_console = (std::intptr_t)&WriteConsoleA;
                 // call rax
                 code.insert(code.end(), { 0xFF, 0xD0 });
                 // add rsp, 56
                 code.insert(code.end(), { 0x48, 0x83, 0xC4, 0x38 });
+                // pop rbx
+                code.push_back(0x5B);
                 // pop rcx 
                 code.push_back(0x59);
             }
         } break;
-        case Token::Kind::IN: {
+        case Token::Kind::STDIN: {
             for (std::size_t i = 0; i < token.operand; ++i) {
                 // push rcx
                 code.push_back(0x51);
