@@ -1,20 +1,37 @@
 module;
 #if _WIN32
 #include "Windows.h"
-#else
-#error platform not supported
 #endif
 module bf;
 
+#if _WIN32
+
 using namespace bf;
 
+static std::string GetLastErrorAsString()
+{
+    auto error = GetLastError();
+    if (!error) {
+        return "unknown error";
+    }
 
+    auto  buffer = nullptr;
+
+    auto size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&buffer, 0, NULL);
+
+    std::string message(buffer, size);
+
+    LocalFree(buffer);
+
+    return message;
+}
 Exec::Exec(const Jit jit)
     : _jit(jit), _exec(nullptr)
 {
     _exec = VirtualAlloc(nullptr, jit.code.size(), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     if (_exec == nullptr) {
-        throw std::runtime_error(Win32Interop::GetLastErrorAsString());
+        throw std::runtime_error(GetLastErrorAsString());
     }
 
     memcpy(_exec, jit.code.data(), jit.code.size());
@@ -48,7 +65,7 @@ void Exec::run()
     DWORD protect = 0;
     const auto error = VirtualProtect(_exec, _jit.code.size(), PAGE_EXECUTE, &protect);
     if (error == ERROR) {
-        throw std::runtime_error(Win32Interop::GetLastErrorAsString());
+        throw std::runtime_error(GetLastErrorAsString());
     }
 
     std::vector<unsigned char> mem(_jit.memory_size_required);
@@ -80,3 +97,6 @@ void Exec::dump(const std::size_t bytes_per_row)
     }
     std::cout.flags(f);
 }
+#else
+#error platform not supported
+#endif

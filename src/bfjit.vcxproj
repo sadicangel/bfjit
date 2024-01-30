@@ -75,8 +75,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="bf-Win32Interop.cpp" />
-    <ClCompile Include="bf-Win32Interop.ixx" />
     <ClCompile Include="bf-Examples.ixx" />
     <ClCompile Include="bf-Interpreter.cpp" />
     <ClCompile Include="bf-Interpreter.ixx" />

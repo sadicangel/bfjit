@@ -45,6 +45,8 @@ namespace bf {
 
         static constexpr std::string_view cat = ",[.[-],]";
 
+        static constexpr std::string_view reverse_3 = ",>,>,.<.<.";
+
         static constexpr std::string_view mandelbrot =
             "+++++++++++++[->++>>>+++++>++>+<<<<<<]>>>>>++++++>--->>>>>>>>>>+++++++++++++++[["
             ">>>>>>>>>]+[<<<<<<<<<]>>>>>>>>>-]+[>>>>>>>>[-]>]<<<<<<<<<[<<<<<<<<<]>>>>>>>>[-]+"

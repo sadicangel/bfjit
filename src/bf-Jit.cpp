@@ -63,8 +63,8 @@ void Jit::compile()
                 code.push_back(0x51);
                 // push rbx
                 code.push_back(0x53);
-                // sub rsp, 56
-                code.insert(code.end(), { 0x48, 0x83, 0xEC, 0x38 });
+                // sub rsp, 48
+                code.insert(code.end(), { 0x48, 0x83, 0xEC, 0x30 });
                 // mov rbx, rcx
                 code.insert(code.end(), { 0x48, 0x89, 0xCB });
                 // mov ecx, STD_OUTPUT_HANDLE
@@ -77,24 +77,24 @@ void Jit::compile()
                 *get_std_handle = (std::intptr_t)&GetStdHandle;
                 // call rax
                 code.insert(code.end(), { 0xFF, 0xD0 });
-                // xor r9d, r9d
-                code.insert(code.end(), { 0x45, 0x31, 0xC9 });
-                // mov qword [rsp + 32], 0
-                code.insert(code.end(), { 0x48, 0xC7, 0x44, 0x24, 0x20, 0x00, 0x00, 0x00, 0x00 });
-                // mov rdx, rbx 
-                code.insert(code.end(), { 0x48, 0x89, 0xDA });
                 // mov rcx, rax
                 code.insert(code.end(), { 0x48, 0x89, 0xC1 });
-                // lea r8d, [r9 + 1]
-                code.insert(code.end(), { 0x45, 0x8D, 0x41, 0x01 });
+                // mov rdx, rbx 
+                code.insert(code.end(), { 0x48, 0x89, 0xDA });
+                // mov r8, 1
+                code.insert(code.end(), { 0x49, 0xC7, 0xC0, 0x01, 0x00, 0x00, 0x00 });
+                // lea r9, [rsp + 40]
+                code.insert(code.end(), { 0x4C, 0x8D, 0x4C, 0x24, 0x28 });
+                // mov qword [rsp + 32], 0
+                code.insert(code.end(), { 0x48, 0xC7, 0x44, 0x24, 0x20, 0x00, 0x00, 0x00, 0x00 });
                 // mov rax, qword &WriteConsoleA
                 code.insert(code.end(), { 0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
                 const auto write_console = reinterpret_cast<std::intptr_t*>(&code[code.size() - sizeof(std::intptr_t)]);
                 *write_console = (std::intptr_t)&WriteConsoleA;
                 // call rax
                 code.insert(code.end(), { 0xFF, 0xD0 });
-                // add rsp, 56
-                code.insert(code.end(), { 0x48, 0x83, 0xC4, 0x38 });
+                // add rsp, 48
+                code.insert(code.end(), { 0x48, 0x83, 0xC4, 0x30 });
                 // pop rbx
                 code.push_back(0x5B);
                 // pop rcx 
@@ -105,16 +105,42 @@ void Jit::compile()
             for (std::size_t i = 0; i < token.operand; ++i) {
                 // push rcx
                 code.push_back(0x51);
-                // sub rsp, 56
-                code.insert(code.end(), { 0x48, 0x83, 0xEC, 0x38 });
-                // mov rax, qword &Win32Interop::read
+                // push rbx
+                code.push_back(0x53);
+                // sub rsp, 48
+                code.insert(code.end(), { 0x48, 0x83, 0xEC, 0x30 });
+                // mov rbx, rcx
+                code.insert(code.end(), { 0x48, 0x89, 0xCB });
+                // mov ecx, STD_INPUT_HANDLE
+                code.insert(code.end(), { 0xB9, 0x00, 0x00, 0x00, 0x00 });
+                const auto std_output_handle = reinterpret_cast<std::int32_t*>(&code[code.size() - sizeof(std::uint32_t)]);
+                *std_output_handle = STD_INPUT_HANDLE;
+                // mov rax, qword &GetStdHandle
                 code.insert(code.end(), { 0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
-                auto ptr = reinterpret_cast<std::intptr_t*>(&code[code.size() - sizeof(std::intptr_t)]);
-                *ptr = (std::intptr_t)&Win32Interop::read;
+                const auto get_std_handle = reinterpret_cast<std::intptr_t*>(&code[code.size() - sizeof(std::intptr_t)]);
+                *get_std_handle = (std::intptr_t)&GetStdHandle;
                 // call rax
                 code.insert(code.end(), { 0xFF, 0xD0 });
-                // add rsp, 56
-                code.insert(code.end(), { 0x48, 0x83, 0xC4, 0x38 });
+                // mov rcx, rax
+                code.insert(code.end(), { 0x48, 0x89, 0xC1 });
+                // mov rdx, rbx 
+                code.insert(code.end(), { 0x48, 0x89, 0xDA });
+                // mov r8, 1
+                code.insert(code.end(), { 0x49, 0xC7, 0xC0, 0x01, 0x00, 0x00, 0x00 });
+                // lea r9, [rsp + 40]
+                code.insert(code.end(), { 0x4C, 0x8D, 0x4C, 0x24, 0x28 });
+                // mov qword [rsp + 32], 0
+                code.insert(code.end(), { 0x48, 0xC7, 0x44, 0x24, 0x20, 0x00, 0x00, 0x00, 0x00 });
+                // mov rax, qword &ReadConsoleA
+                code.insert(code.end(), { 0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
+                const auto write_console = reinterpret_cast<std::intptr_t*>(&code[code.size() - sizeof(std::intptr_t)]);
+                *write_console = (std::intptr_t)&ReadConsoleA;
+                // call rax
+                code.insert(code.end(), { 0xFF, 0xD0 });
+                // add rsp, 48
+                code.insert(code.end(), { 0x48, 0x83, 0xC4, 0x30 });
+                // pop rbx
+                code.push_back(0x5B);
                 // pop rcx 
                 code.push_back(0x59);
             }
